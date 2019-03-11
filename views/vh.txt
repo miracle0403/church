@@ -1,0 +1,1 @@
+insert into products (category, product_id,  price, product_name, description, image, status, discount) values ('fashion', 35015776, 3070, 'Fine belly bedia', 'the best bely belt fo gjfhgh hjhf ghhh hhhhr your dinner dress.', ['/images/img3.jpg', '/images/img2.jpg'], 'in stock', 0);

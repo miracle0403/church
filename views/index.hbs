@@ -1,0 +1,59 @@
+<section class="text-center container-fluid">
+<br><br>
+    <div class="container bg bg-danger text-white"><hr><b>
+      <h2 class = "h2">
+  ABOUT US</b></h2>
+  <hr>
+  </div>
+  <p><small class="text-muted">what we do</small></p>
+      <p class="lead text-muted">Something nice to tell people what you do.</p>
+      <p>
+        <a href="#" class="btn btn-secondary my-2">Call Now</a>
+        <a href="#" class="btn btn-secondary my-2">WhatsApp now</a>
+      </p>
+  </section>
+  <div class  = "container bg bg-danger">
+  <hr>
+  <h3 class = "h3 text-center text-white"><b>OUR PRODUCTS</b>
+  </h3>
+  <hr>
+  </div>
+  <div class = "container card-deck">
+  {{#if products}}
+  {{#each products}}
+ <div class="card">
+ <img src="{{image}}" class="card-img-top" alt="{{image}}"> 
+ <div class= "card-hearder container bg bg-secondary text-center text-white"><br>
+  <h5 class="card-title"> {{product_name}}</h5>
+  </div>
+  <div class = "card-body bg bg-light">
+   <p class="card-text">{{description}}.</p> 
+   <a href = "/category={{category}}/product={{product_name}}">View Product</a>
+   </div>
+    <div class="card-footer bg bg-danger"> <small class="text-white"><b>Price: N{{price}}</b></small> 
+    </div> 
+    </div> 
+ {{/each}}
+ {{/if}}
+ <br>
+ <hr>
+ </div>
+ <div class = "container">
+ <div class = "container text-center">
+ <nav aria-label="Page navigation example">
+  <ul class="pagination">
+	{{#paginate pagination type="previous"}} 
+	<li {{#if disabled}} class="page-item disabled" {{else}} class = "page-item" {{/if}}><a class = "page-link" href="/page={{n}}" >Previous</a></li>
+	{{/paginate}}
+{{#paginate pagination type="middle" limit="7"}}
+<li {{#if active}} class="page-item active" {{else}} class = "page-item" {{/if}}><a class = "page-link" href="/page={{n}}">{{n}}</a>
+</li>
+{{/paginate}}
+  {{#paginate pagination type="next"}}
+   <li {{#if disabled}} class="page-item disabled" {{else}} class = "page-item" {{/if}}><a href="/page={{n}}" class = "page-link">Next</a>
+   </li> 
+   {{/paginate}}
+  </nav>
+  </ul>
+  </div>
+</div>

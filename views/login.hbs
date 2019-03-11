@@ -1,0 +1,31 @@
+{{#showErrors}}
+{{#errors}}
+  <div class="alert alert-danger">
+    {{.}}
+  </div>
+{{/errors}}
+{{/showErrors}}
+<br><br>
+         
+         <div class = "text-white text-center bg bg-danger"><hr>
+        <h4 style="text-align: center"><b>{{title}}</b></h4><hr>
+     </div>
+     
+
+	   <form method ="POST" action ="/login">
+	  <div class="container"> 
+  
+    <div class="form-group">
+    <label for="exampleInputPassword1">Password</label>
+    <input type="text" class="form-control" id="username" placeholder="Enter Username" name = "username">
+  </div>
+<div class="form-group">
+    <label for="exampleInputPassword1">Password</label>
+    <input type="password" name = "password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+  </div>
+   
+    	<div class="form-group"> <button type="submit" class="btn btn-block btn-secondary">Submit</button> </form><br><br>
+<!--<p>Forgot Password, Click <a href ="/passwordreset">here. </a>Don't have an account, <a href ="/register">register</a>.
+</p>-->
+	</div>
+    </div>

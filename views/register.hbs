@@ -1,0 +1,74 @@
+{{#if errors}}
+  {{#each errors}}
+  <div class="alert alert-danger">
+    {{this.msg}}
+  </div>
+  {{/each}}
+{{/if}}
+
+{{#if error}}
+  <div class="alert alert-danger">
+    {{error}}
+  </div>
+  {{/if}}
+  {{#if success}}
+  <div class="alert alert-success">
+    {{success}}
+  </div>
+  {{/if}}
+  <div class = "container">
+    <div class="bg bg-danger text-white text-center"> 
+    <hr>
+        <b><h4 class = "h4 text-center text-white">{{title}}</b></h4>
+        <hr>
+ </div>
+<form method ="POST" action ="/register">
+
+      
+    <div class="form-group">
+    <label for="fullname">Full Name</label>
+    <input type="text" class="form-control"  
+id="fullname" name ="fullname" placeholder="Enter Full Name" value="{{fullname}}" required />
+</div>
+    <div class="form-group">
+    <label for="username">username</label>
+    <input type="text" class="form-control" 
+id="username" name ="username" placeholder="Enter username" value="{{username}}"  required />
+</div>
+    <div class="form-group">
+<label for="Email">Email address</label>
+    <input type="email" class="form-control" id="Email" aria-describedby="emailHelp" name ="email" placeholder="Enter email" value="{{email}}"  required />
+    <small id="emailHelp" class="form-text text-muted">We'll 
+never share your email with anyone else.</small>
+</div>
+	
+    <div class="form-group ">
+    <label for="countrycode">Country Code</label>
+  <input type="tel" class="form-control" id="code" name ="code" placeholder="e.g +234" value="234"  required />
+</div>
+    <div class="form-group">
+    <label for="phone">Phone Number</label>
+  <input type="tel" class="form-control" id="phone" name ="phone" placeholder="e.g 8012345678" value="{{phone}}"  required />
+</div>
+	
+	
+    <div class="form-group">
+    <label for="Pass1">Password</label>
+    <input type="password" class="form-control" 
+id="Pass1" name ="pass1" value="{{password}}"  placeholder="Password" required />
+</div>
+
+<div class="form-group">
+<label for="Pass1">Confirm Password</label>
+<input type="password" class="form-control" 
+id="Pass2" name ="pass2" value="{{cpass}}"  placeholder="Password" required />
+</div>
+	
+		
+	   
+   <div class="form-group">
+  <button type="submit" id="registerbutton" class="btn btn-block btn-secondary">Register</button>
+ </div>
+</form>
+</div>
+</div>
