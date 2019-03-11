@@ -17,10 +17,10 @@
   </div>
   {{/if}}
   <div class = "container">
-    <div class="bg bg-danger text-white text-center"> 
-    <hr>
-        <b><h4 class = "h4 text-center text-white">{{title}}</b></h4>
-        <hr>
+    <div class="text-center"> 
+    
+        <b><h4 class = "h4 text-center text-success">{{title}}</b></h4>
+        
  </div>
 <form method ="POST" action ="/register">
 
@@ -31,9 +31,14 @@
 id="fullname" name ="fullname" placeholder="Enter Full Name" value="{{fullname}}" required />
 </div>
     <div class="form-group">
-    <label for="username">username</label>
+    <label for="username">Username</label>
     <input type="text" class="form-control" 
 id="username" name ="username" placeholder="Enter username" value="{{username}}"  required />
+</div>
+<div class="form-group">
+    <label for="address">Address</label>
+    <input type="text" class="form-control" 
+id="username" name ="address" placeholder="Enter address" value="{{address}}"  required />
 </div>
     <div class="form-group">
 <label for="Email">Email address</label>
@@ -67,7 +72,7 @@ id="Pass2" name ="pass2" value="{{cpass}}"  placeholder="Password" required />
 		
 	   
    <div class="form-group">
-  <button type="submit" id="registerbutton" class="btn btn-block btn-secondary">Register</button>
+  <button type="submit" id="registerbutton" class="btn btn-success">Register</button>
  </div>
 </form>
 </div>

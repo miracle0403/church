@@ -34,80 +34,68 @@ function admin(x, y, j){
 
 //get home 
 router.get('/',  function(req, res, next) {
-	res.redirect('/page=1');
-});
-
-//product 
-router.get('/category=:category/product=:product',  function(req, res, next) {
-	var product = req.params.product;
-	var category = req.params.category;
-	db.query( 'SELECT * FROM products WHERE product_name = ? and category_name = ?',  [product, category], function(err, results, fields){
+	//get the top three events
+	db.query( 'SELECT * FROM events WHERE status = ? ORDER BY id LIMIT 3',  ['upcoming'], function(err, results, fields){
 		if( err ) throw err;
-		var product = results[0];
-		res.render('preoduct', {title: product.product_name, product: product});
+		var events = results;
+		var urgentEvent = results[0];
+		//get the top national news.
+		db.query( 'SELECT * FROM national_news ORDER BY id DESC LIMIT 3',  function(err, results, fields){
+			if( err ) throw err;
+			var NationalNews = results;
+			var topNational = results[0];
+			db.query( 'SELECT * FROM loveworldnews ORDER BY id DESC LIMIT 3', function(err, results, fields){
+				if( err ) throw err;
+				var NationalNews = results;
+				var toploveWorld = results[0];
+				db.query( 'SELECT * FROM messages ORDER BY id DESC LIMIT 3', function(err, results, fields){
+					if( err ) throw err;
+					var NationalNews = results;
+					db.query( 'SELECT affirmation_date, topic FROM affirmation ORDER BY id DESC LIMIT 7', function(err, results, fields){
+						if( err ) throw err;
+						var affirmation = results;
+						db.query( 'SELECT devotional_date, topic FROM devotional ORDER BY id DESC LIMIT 7', function(err, results, fields){
+							if( err ) throw err;
+							var devotional = results;
+							db.query( 'SELECT * FROM quotes ORDER BY id DESC LIMIT 1', function(err, results, fields){
+								if( err ) throw err;
+								var quotes = results
+								res.render('index', {title: "LOVEWORLD", quotes: quotes, affirmation: affirmation, devotional: devotional, urgentEvent: urgentEvent, events: events, messages:messages, topNational: topNational, toploveWorld: toploveWorld, nationalNews: NationalNews});
+							});
+						});
+					});
+				});
+			});
+		});
 	});
 });
 
-//get category
-router.get('/category=:category/page=:page',  function(req, res, next) {
-	var limit  =  12;
-	var page = req.params.page;
-	var category = req.params.category;
-	db.query( 'SELECT COUNT( product_id) AS total FROM products WHERE status  = ? and category_name = ?',  ['in stock', category], function(err, results, fields){
+//get events 
+router.get('/joinevent',  function(req, res, next) {
+	db.query( 'SELECT event_name FROM events WHERE status = ?  ORDER BY id LIMIT 12',  ['upcoming'], function(err, results, fields){
 		if( err ) throw err;
-		var totalrows = results[0].total;
-		var pages = math.ceil( totalrows / limit ); 
-		if( pages === 1 ){
-			var offset = 0;
-			var sql = 'SELECT * FROM products WHERE status  =  ? and category_name = ? LIMIT ?, ?';
-			var details =  ['in stock', category, offset, limit];
-			db.query(sql, details, function ( err, results, fields ){
-				if( err ) throw err;
-				var products = results;
-				//var links = ['/pages/1'];
-				res.render( 'category', {title: 'ALL' + category, products: products, pagination: { page: page, pageCount: pages }});
-			});
-		}else{
-			var offset = ( page * limit ) - limit;
-			var sql = 'SELECT * FROM products WHERE status  =  ? and category_name = ? LIMIT ?, ?';
-			var details =  ['in stock', category, offset, limit];
-			db.query(sql, details, function ( err, results, fields ){
-				if( err ) throw err;
-				var products = results;
-				res.render( 'index', {title: 'ALL' + category, products: products, pagination: { page: page, pageCount: pages }});
-			});
-		}
+		var events = results;
+		res.render('events', {title: 'UP COMING EVENTS', events: events});
 	});
 });
 
-/* GET home page. */
-router.get('/page=:page', function ( req, res, next ){
-	var limit  =  12;
-	var page = req.params.page;
-	db.query( 'SELECT COUNT( product_id) AS total FROM products WHERE status  = ?',  ['in stock'], function(err, results, fields){
+//get devotional 
+router.get('/devotional/:topic',  function(req, res, next) {
+	var topic = req.params.topic;
+	db.query( 'SELECT * FROM devotional WHERE status = ?  ORDER BY id LIMIT 12',  ['upcoming'], function(err, results, fields){
 		if( err ) throw err;
-		var totalrows = results[0].total;
-		var pages = math.ceil( totalrows / limit ); 
-		if( pages === 1 ){
-			var offset = 0;
-			var sql = 'SELECT * FROM products WHERE status  =  ?  LIMIT ?, ?';
-			var details =  ['in stock', offset, limit];
-			db.query(sql, details, function ( err, results, fields ){
-				if( err ) throw err;
-				var products = results;
-				//var links = ['/pages/1'];
-				res.render( 'index', {title: 'IFEY SAMUEL', products: products, pagination: { page: page, pageCount: pages }});
-			});
-		}else{
-			var offset = ( page * limit ) - limit;
-			var sql = 'SELECT * FROM products WHERE status  =  ?  LIMIT ?, ?';
-			var details =  ['in stock', offset, limit];
-			db.query(sql, details, function ( err, results, fields ){
-				if( err ) throw err;
-				var products = results;
-				res.render( 'index', {title: 'IFEY SAMUEL', products: products, pagination: { page: page, pageCount: pages }});
-			});
-		}
+		var devotional = results;
+		res.render('devotional', {title: 'Rhapsody Of Realities', devotional: devotional});
+	});
+});
+
+//get affirmation
+router.get('/affirmation/:topic',  function(req, res, next) {
+	var topic = req.params.topic;
+	db.query( 'SELECT * FROM affirmation WHERE status = ?  ORDER BY id LIMIT 12',  ['upcoming'], function(err, results, fields){
+		if( err ) throw err;
+		var affirmation = results;
+		res.render('affirmation', {title: 'AFFIRMATION TRAIN', affirmation: affirmation});
 	});
 });
 
@@ -172,14 +160,18 @@ router.post('/status', function(req, res, next) {
 	});
 });
 
+
 //post search.
-router.post('/searchproduct', function(req, res, next) {
-	var product_id = req.body.product_id;
-	
-	db.query( 'SELECT * FROM products WHERE product_id = ?', [product_id], function ( err, results, fields ){
+router.post('/joinevent', function(req, res, next) {
+	db.query( 'SELECT phone FROM attendance WHERE phone = ? and event_name = ?', [phone, event_name], function ( err, results, fields ){
 		if(err) throw err;
-		var product = results;
-		res.render('upload', {title: 'ADMIN CORNER', searchresults: product});
+		if (results.length > 0){
+			var error = 'We think you have indicated interest to attend this event already and we reserved a special place fir you.';
+			res.render('events', {title: 'Up Coming Events', error: error});
+		}else{
+			var success = 'You are good to go! See you at ' + event_name;
+			res.render('events', {title: 'Up Coming Events', success: success});
+		}
 	});
 });
 
@@ -288,19 +280,19 @@ router.post('/addcategory',  function(req, res, next) {
 });
 
 
-router.post('/upload', function(req, res, next) {
+router.post('/createEvent', function(req, res, next) {
 	//var category = req.body.category;
 	if (req.url == '/upload' && req.method.toLowerCase() == 'post') {
 		// parse a file upload
 		var form = new formidable.IncomingForm();
-		form.uploadDir = '/Users/STAIN/desktop/sites//obionyi/public/images/samples';
-		form.maxFileSize = 2 * 1024 * 1024;
-		form.parse(req, function(err, fields, files) {
-			//var img = fields.img; 
-			var category = fields.category;
-			var price = fields.price;
+		form.uploadDir = '/Users/STAIN/desktop/sites//obionyi/public/images/events';
+		form.maxFileSize = 4 * 1024 * 1024;
+		form.parse(req, function(err, fields, files) { 
+			var Name = fields.name;
+			var venue = fields.venue;
+			var start = fields.start;
+			var stop = fields.stop;
 			var description = fields.description;
-			var product = fields.product;
 			console.log(fields);
 			var getfiles = JSON.stringify( files );
 			var file = JSON.parse( getfiles );
@@ -316,14 +308,11 @@ router.post('/upload', function(req, res, next) {
 					if (err) throw err;
 					//console.log('file renamed');
 				});
-				//secure pin for code
-				securePin.generatePin(10, function(pin){
 				//save in the database.
-					db.query('INSERT INTO products (image, category, price, product_id, description, product_name, status) VALUES (?, ?, ?, ?, ?, ?, ?)', [img, category, price, pin, description, product, 'in stock'], function(err,results, fields){
+					db.query('INSERT INTO events (image, venue, status, start, stop, description, event_name) VALUES (?, ?, ?, ?, ?, ?, ?)', [img, venue, 'upcoming', start, stop, description, Name], function(err,results, fields){
 						if (err)  throw err;
-						res.render('upload', {title: 'ADMIN CORNER', uploadsuccess: 'file upladed'});
+						res.render('upload', {title: 'ADMIN CORNER', uploadsuccess: 'Event Added'});
 					});
-				});
 			});
 			form.emit('fileBegin', name, file);
 	    });
@@ -353,7 +342,8 @@ router.post('/register', function (req, res, next) {
 	req.checkBody('code', 'Country Code must not be empty.').notEmpty();
 	req.checkBody('pass1', 'Password must match').equals(req.body.pass2);
 	req.checkBody('phone', 'Phone Number must be ten characters').len(10);
-  
+	req.checkBody('address', 'Address must be 200 characters').len(200);
+	
 	var username = req.body.username;
 	var password = req.body.pass1;
 	var cpass = req.body.pass2;
@@ -361,13 +351,14 @@ router.post('/register', function (req, res, next) {
 	var fullname = req.body.fullname;
 	var code = req.body.code;
 	var phone = req.body.phone;
-
+	var address = req.body.address;
+	
 	var errors = req.validationErrors();
 	if (errors) { 
 	
 		console.log(JSON.stringify(errors));
   
-		res.render('register', { title: 'REGISTRATION FAILED', errors: errors, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code, sponsor: sponsor});
+		res.render('register', { title: 'REGISTRATION FAILED', errors: errors, address: address, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code, sponsor: sponsor});
 	}else{
 		db.query('SELECT username FROM user WHERE username = ?', [username], function(err, results, fields){
           	if (err) throw err;
@@ -375,7 +366,7 @@ router.post('/register', function (req, res, next) {
           	if(results.length===1){
           		var error = "Sorry, this username is taken";
 				console.log(error);
-				res.render('register', {title: "REGISTRATION FAILED", error: error, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code,  sponsor: sponsor});
+				res.render('register', {title: "REGISTRATION FAILED", error: error, address: address, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code,  sponsor: sponsor});
           	}else{
 				//check the email
 				db.query('SELECT email FROM user WHERE email = ?', [email], function(err, results, fields){
@@ -383,10 +374,10 @@ router.post('/register', function (req, res, next) {
           			if(results.length===1){
           				var error = "Sorry, this email is taken";
             			console.log(error);
-						res.render('register', {title: "REGISTRATION FAILED", error: error, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code,  sponsor: sponsor});
+						res.render('register', {title: "REGISTRATION FAILED", error: error, address: address, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code,  sponsor: sponsor});
             		}else{
 						bcrypt.hash(password, saltRounds, null, function(err, hash){
-							db.query( 'INSERT INTO user (full_name, phone, username, email, code, password) VALUES(?,  ?, ?, ?, ?, ?)', [ fullname, phone, username, email, code, hash], function(err, result, fields){
+							db.query( 'INSERT INTO user (full_name, phone, address, username, email, code, password) VALUES(?, ?, ?, ?, ?, ?, ?)', [ fullname, phone, address, username, email, code, hash], function(err, result, fields){
 								if (err) throw err;
 								var success = 'Successful registration';
 								res.render('register', {title: 'REGISTRATION SUCCESSFUL!', success: success});
