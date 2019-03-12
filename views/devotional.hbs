@@ -1,0 +1,15 @@
+<h3 class = "h3 text-center text-success" id = "h3"><b>{{TITLE}}</b></h3>
+
+{{#if devotional}}
+{{#each devotional}}
+
+<h3 class = "text-center text-success"> {{topic}}</h3>
+<br>
+<pre>
+<p class = "text-justify">{{news}}</p>
+</pre>
+
+<small> {{devotional_date}}</small>
+
+{{/each}}
+{{/if}}

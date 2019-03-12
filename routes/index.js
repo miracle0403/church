@@ -35,6 +35,9 @@ function admin(x, y, j){
 		if(err) throw err;
 		if(results.length === 0){
 			j.redirect('/404');
+		}else{
+			var admin = x;
+			j.render('upload', {title: 'ADMIN CORNER', admin: admin});
 		}
 	});
 }
@@ -42,7 +45,7 @@ function admin(x, y, j){
 //get home 
 router.get('/',  function(req, res, next) {
 	//get the top three events
-	db.query( 'SELECT * FROM events WHERE status = ? ORDER BY id LIMIT 3',  ['upcoming'], function(err, results, fields){
+	db.query( 'SELECT * FROM events WHERE status = ? ORDER BY id LIMIT 3',  ['Up coming'], function(err, results, fields){
 		if( err ) throw err;
 		var events = results;
 		var urgentEvent = results[0];
@@ -58,10 +61,10 @@ router.get('/',  function(req, res, next) {
 				db.query( 'SELECT * FROM messages ORDER BY id DESC LIMIT 3', function(err, results, fields){
 					if( err ) throw err;
 					var messages = results;
-					db.query( 'SELECT affirmation_date, topic FROM affirmation ORDER BY affirmation_date DESC LIMIT 7', function(err, results, fields){
+					db.query( 'SELECT affirmation_date, Topic FROM affirmation ORDER BY affirmation_date DESC LIMIT 7', function(err, results, fields){
 						if( err ) throw err;
 						var affirmation = results;
-						db.query( 'SELECT devotional_date, topic FROM devotional ORDER BY devotional_date DESC LIMIT 7', function(err, results, fields){
+						db.query( 'SELECT devotional_date, Topic FROM devotional ORDER BY devotional_date DESC LIMIT 7', function(err, results, fields){
 							if( err ) throw err;
 							var devotional = results;
 							db.query( 'SELECT * FROM quotes ORDER BY entered DESC LIMIT 1', function(err, results, fields){
@@ -79,7 +82,7 @@ router.get('/',  function(req, res, next) {
 
 //get events 
 router.get('/events',  function(req, res, next) {
-	db.query( 'SELECT event_name FROM events WHERE status = ?  ORDER BY id LIMIT 12',  ['upcoming'], function(err, results, fields){
+	db.query( 'SELECT event_name FROM events WHERE status = ?  ORDER BY id',  ['Up coming'], function(err, results, fields){
 		if( err ) throw err;
 		var events = results;
 		res.render('events', {title: 'UP COMING EVENTS', events: events});
@@ -89,7 +92,7 @@ router.get('/events',  function(req, res, next) {
 //get devotional 
 router.get('/devotional/:topic',  function(req, res, next) {
 	var topic = req.params.topic;
-	db.query( 'SELECT * FROM devotional WHERE status = ?  ORDER BY id LIMIT 12',  ['upcoming'], function(err, results, fields){
+	db.query( 'SELECT * FROM devotional WHERE Topic = ?',  [topic], function(err, results, fields){
 		if( err ) throw err;
 		var devotional = results;
 		res.render('devotional', {title: 'Rhapsody Of Realities', devotional: devotional});
@@ -99,7 +102,7 @@ router.get('/devotional/:topic',  function(req, res, next) {
 //get affirmation
 router.get('/affirmation/:topic',  function(req, res, next) {
 	var topic = req.params.topic;
-	db.query( 'SELECT * FROM affirmation WHERE status = ?  ORDER BY id LIMIT 12',  ['upcoming'], function(err, results, fields){
+	db.query( 'SELECT * FROM affirmation WHERE Topic = ?',  [topic], function(err, results, fields){
 		if( err ) throw err;
 		var affirmation = results;
 		res.render('affirmation', {title: 'AFFIRMATION TRAIN', affirmation: affirmation});
@@ -112,8 +115,7 @@ router.get('/affirmation/:topic',  function(req, res, next) {
 router.get('/admin', ensureLoggedIn('/login'), function(req, res, next) {
 	//get the category.
 	var currentUser = req.session.passport.user.user_id;
-	//admin(currentUser, db, res);
-	res.render('upload',  { title: 'ADMIN CORNER'});
+	admin(currentUser, db, res);
 });
 
 
@@ -155,9 +157,9 @@ passport.deserializeUser(function(user_id, done){
 
 //post add status.
 router.post('/eventstatus', function(req, res, next) {
-	var status = req.body.status;
+	var eventstatus = req.body.eventstatus;
 	var id = req.body.id;
-	db.query( 'UPDATE events SET status  = ? WHERE id = ?', [status, id], function ( err, results, fields ){
+	db.query( 'UPDATE events SET status  = ? WHERE id = ?', [eventstatus, id], function ( err, results, fields ){
 		if(err) throw err;
 		res.render('upload', {title: 'ADMIN CORNER', statussuccess: 'Update was successful'});
 	});
@@ -174,13 +176,13 @@ router.post('/joinevent', parseForm, function(req, res, next) {
 	req.checkBody('email', 'Invalid Email').isEmail();
 	req.checkBody('phone', 'Phone Number must be 14 characters').len(14);
 	req.checkBody( 'phone', 'Phone Number should be a Number' ).isMobilePhone();
-	
+	/*
 	req.sanitizeBody('fullname').trim().escape();
 	req.sanitizeBody('address').trim().escape();
 	req.sanitizeBody('whatsapp').trim().escape();
 	req.sanitizeBody('kingschat').trim().escape();
 	req.sanitizeBody('phone').trim().escape();
-	req.sanitizeBody('email').trim().escape();
+	req.sanitizeBody('email').trim().escape();*/
 	
 	var address = req.body.address;
 	var email = req.body.email;
@@ -200,16 +202,16 @@ router.post('/joinevent', parseForm, function(req, res, next) {
 		db.query( 'SELECT phone FROM attendance WHERE phone = ? and event_name = ?', [phone, events], function ( err, results, fields ){
 			if(err) throw err;
 			if (results.length > 0){
-				var error = 'We think you have indicated interest to attend this event already and we reserved a special place fir you.';
+				var error = fullname + ' We think you have indicated interest to attend this event already and we reserved a special place for you.';
 				res.render('events', {title: 'Up Coming Events', error: error});
 			}else{
 				db.query( 'SELECT start FROM events WHERE event_name = ?', [events], function ( err, results, fields ){
 					if(err) throw err;
 					var start = results[0].start;
-					db.query('INSERT INTO attendance (event_name, event_date, address, phone, email, whatsapp, kingschat) VALUES (?, ?, ?, ?, ?, ?, ?)', [events, start, address, phone, email, whatsapp, kingschat], function(err,results, fields){
+					db.query('INSERT INTO attendance (event_name, event_date, address, phone, email, whatsapp, kingschat) VALUES (?, ?, ?, ?, ?, ?, ?)', [events, start, address, phone, email, wa, ks], function(err,results, fields){
 						if (err)  throw err;
 						//insert into database
-						var success = 'You are good to go!' + fullname + 'See you at ' + event_name;
+						var success = 'You are good to go ' + fullname + '!  See you at ' + events;
 						res.render('events', {title: 'Up Coming Events', success: success});
 					});
 				});
@@ -275,6 +277,83 @@ router.post('/adddevotional', function (req, res, next) {
 	});
 });
 
+//add affirmation
+router.post('/addaffirmation', function (req, res, next) {
+	var topic = req.body.topic;
+	var date = req.body.date;
+	var description = req.body.description;
+	//check if it has been added  before
+	db.query('SELECT topic FROM affirmation WHERE topic = ?', [topic], function(err, results, fields){
+		if( err ) throw err;
+		if(results.length > 0){
+			var error = 'You have added this topic before';
+			res.render('upload', {affirerror: error });
+		}else{
+			db.query('INSERT INTO affirmation (news, topic, affirmation_date) VALUES (?, ?, ?)', [description, topic, date], function(err,results, fields){
+				if (err)  throw err;
+				var success = 'New Affirmation added successfully';
+				res.render('upload', {affirsuccess: success });
+			});
+		}
+	});
+});
+
+//add lwnews
+router.post('/addlwnews', function (req, res, next) {
+	var topic = req.body.topic;
+	var link = req.body.link;
+	var description = req.body.description;
+	//check if it has been added  before
+	db.query('SELECT Topic FROM loveworldnews WHERE Topic = ?', [topic], function(err, results, fields){
+		if( err ) throw err;
+		if(results.length > 0){
+			var error = 'You have added this topic before';
+			res.render('upload', {lwerror: error });
+		}else{
+			db.query('INSERT INTO loveworldnews (highlights, Topic, link) VALUES (?, ?, ?)', [description, link, topic], function(err,results, fields){
+				if (err)  throw err;
+				var success = 'New Love World News added successfully';
+				res.render('upload', {lwsuccess: success });
+			});
+		}
+	});
+});
+
+
+//add nlnews
+router.post('/addnlnews', function (req, res, next) {
+	var topic = req.body.topic;
+	var link = req.body.link;
+	var description = req.body.description;
+	//check if it has been added  before
+	db.query('SELECT Topic FROM nationalnews WHERE Topic = ?', [topic], function(err, results, fields){
+		if( err ) throw err;
+		if(results.length > 0){
+			var error = 'You have added this topic before';
+			res.render('upload', {nlerror: error });
+		}else{
+			db.query('INSERT INTO nationalnews (news, Topic, link) VALUES (?, ?, ?)', [description, link, topic], function(err,results, fields){
+				if (err)  throw err;
+				var success = 'New National News added successfully';
+				res.render('upload', {nlsuccess: success });
+			});
+		}
+	});
+});
+
+//add quotes
+router.post('/quotes', function (req, res, next) {
+	var speaker = req.body.speaker;
+	var quote = req.body.quote;
+	
+	//check if it has been added  before
+	db.query('INSERT INTO quotes (speaker, quotes) VALUES (?, ?)', [speaker, quote], function(err,results, fields){
+		if (err)  throw err;
+		var success = 'New Quote added successfully';
+		res.render('upload', {qusuccess: success });
+	});	
+});
+
 //delete admin
 router.post('/deladmin', function (req, res, next) {
 	var user = req.body.user;
@@ -334,7 +413,7 @@ router.post('/createEvent', function(req, res, next) {
 			var name = file.img.name;
 			form.keepExtensions = true;
 			var newpath = '/Users/STAIN/desktop/sites/church/public/images/events/' + name;
-			var img = '/Users/STAIN/desktop/sites/church/public/images/events/' + name;
+			var img = '/images/events/' + name;
 			form.on('fileBegin', function( name, file){
 				//rename the file
 				fs.rename(oldpath, newpath, function(err){
@@ -342,7 +421,7 @@ router.post('/createEvent', function(req, res, next) {
 					//console.log('file renamed');
 				});
 				//save in the database.
-					db.query('INSERT INTO events (image, venue, status, start, stop, description, event_name) VALUES (?, ?, ?, ?, ?, ?, ?)', [img, venue, 'upcoming', start, stop, description, Name], function(err,results, fields){
+					db.query('INSERT INTO events (image, venue, status, start, stop, description, event_name) VALUES (?, ?, ?, ?, ?, ?, ?)', [img, venue, 'Up coming', start, stop, description, Name], function(err,results, fields){
 						if (err)  throw err;
 						res.render('upload', {title: 'ADMIN CORNER', createeventsuccess: 'Event Added'});
 					});
@@ -379,7 +458,7 @@ router.post('/newmessage',  function(req, res, next) {
 			var name = file.vid.name;
 			form.keepExtensions = true;
 			var newpath = '/Users/STAIN/desktop/sites/church/public/images/messages//' + name;
-			var img = '/Users/STAIN/desktop/sites/church/public/images/messages/' + name;
+			var img = '/images/messages/' + name;
 			form.on('fileBegin', function( name, file){
 				//rename the file
 				fs.rename(oldpath, newpath, function(err){

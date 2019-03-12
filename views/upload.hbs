@@ -1,4 +1,4 @@
-<h3 class = "h3 text-center text-success" id = "h3"><b>{{TITLE}}</b></h3>
+<h3 class = "h3 text-center text-success" id = "h3"><b>{{title}}</b></h3>
 
 
 <div class = "row">
@@ -135,7 +135,7 @@
 	<h3 class = "h5 text-center text-success" id = "h5"><b>DEVOTIONAL</b></h5>
 	<form method ="POST" action ="/adddevotional">
 	{{#if devoerror}}
-		<div class = "alert alert-success">
+		<div class = "alert alert-danger">
 		{{devoerror}}
 		</div>
 		{{/if}}
@@ -167,8 +167,8 @@
 	<h3 class = "h5 text-center text-success" id = "h5"><b>AFFIRMATION</b></h5>
 	<form method ="POST" action ="/addaffirmation">
 	{{#if affirerror}}
-		<div class = "alert alert-success">
-		{{daffirerror}}
+		<div class = "alert alert-danger">
+		{{affirerror}}
 		</div>
 		{{/if}}
 		{{#if affirsuccess}}
@@ -201,20 +201,22 @@
 	<div class = "col-md-6">
 	<h3 class = "h5 text-center text-success" id = "h5"><b>ADD LOVE WORLD NEWS</b></h5>
 	<form method ="POST" action ="/addlwnews">
+	{{#if lwerror}}
+		<div class = "alert alert-error">
+		{{lwerror}}
+		</div>
+		{{/if}}
+		{{#if lwsuccess}}
+		<div class = "alert alert-success">
+		{{lwsuccess}}
+		</div>
+		{{/if}}
 			<div class = "row">
-			<div class="form-group col-md-3">
+			<div class="form-group col-md-6">
 				<label for="product">Topic</label>
 				<input type="text" class="form-control" id="topic" name ="topic" placeholder="Enter Topic" required />
 			</div>
-			<div class="form-group col-md-3">
-				<label for="date">Date</label>
-				<input type="date" class="form-control" id="topic" name ="date" placeholder="Enter Date" required />
-			</div>
-			<div class="form-group col-md-2">
-				<label for="date">Time</label>
-				<input type="time" class="form-control" id="time" name ="time" placeholder="Enter Date" required />
-			</div>
-			<div class="form-group col-md-2">
+			<div class="form-group col-md-6">
 				<label for="link">Link</label>
 				<input type="text" class="form-control" id="link" name ="link" placeholder="Enter Link" required />
 			</div>
@@ -231,16 +233,23 @@
 	<div class = "col-md-6">
 	<h3 class = "h5 text-center text-success" id = "h5"><b>ADD NATIONAL NEWS</b></h5>
 	<form method ="POST" action ="/addnlnews">
+	{{#if nlerror}}
+		<div class = "alert alert-error">
+		{{nlerror}}
+		</div>
+		{{/if}}
+		{{#if nlsuccess}}
+		<div class = "alert alert-success">
+		{{nlsuccess}}
+		</div>
+		{{/if}}
 			<div class = "row">
-			<div class="form-group col-md-4">
+			<div class="form-group col-md-6">
 				<label for="product">Topic</label>
 				<input type="text" class="form-control" id="topic" name ="topic" placeholder="Enter Topic" required />
 			</div>
-			<div class="form-group col-md-3">
-				<label for="date">Date</label>
-				<input type="date" class="form-control" id="topic" name ="date" placeholder="Enter Date" required />
-			</div>
-			<div class="form-group col-md-5">
+			
+			<div class="form-group col-md-6">
 				<label for="link">Link</label>
 				<input type="text" class="form-control" id="link" name ="link" placeholder="Enter Link" required />
 			</div>
@@ -314,26 +323,48 @@
 		</div>
 		{{/if}}
 		<form method ="POST" action ="/eventstatus">
-		<div class = "form-row">
-			<div class="form-group col-md-6">
+		
+			<div class="form-group>
 				<label for="product">Event Id</label>
 				<input type="number" class="form-control" id="event_id" name ="id" placeholder="Enter Event id" required />
 			</div>
-			<div class="form-group col-md-6">
+			<br>
+			<div class="form-group">
 			<label for="status">Status</label>
 				<select class = "form-control" name = "eventstatus">
 					
 					<option>Up Coming</option>
 					<option>Past</option>
 				</select>
+			
 			</div>
-			</div>
+			<br>
 			<div class="form-group">
 				<button id = "update" type="submit" class="btn btn-success">Submit</button>
 				</div>
 		</form>
 		</div>
 		<div class = "col-md-6">
+		<form method ="POST" action ="/quotes">
+			<h3 class = "h5 text-center text-success" id = "h5"><b>ADD QUOTES</b></h5>
+		{{#if qusuccess}}
+		<div id = "stats" class = " container alert alert-success">
+		{{qusuccess}}
+		</div>
+		{{/if}}
+		
+		<div class="form-group">
+				<label for="speaker">Speaker</label>
+				<input type="text" class="form-control" id="speaker" name ="speaker" placeholder="Enter Speaker's name" required />
+			</div>
+			<div class="form-group">
+				<label for="description">Quote</label>
+				<textarea class="form-control" id="description"  name ="quote" placeholder="Enter quote"></textarea>
+			</div>
+			<div class="form-group">
+				<button id = "update" type="submit" class="btn btn-success">Submit</button>
+				</div>
+		</form>
 		</div>
 	</div>
 	
