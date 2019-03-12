@@ -38,7 +38,7 @@ db.query( 'CREATE TABLE IF NOT EXISTS quotes (speaker varchar( 255 ) NOT NULL, q
 	console.log( 'quotes table created' );
 });
 
-db.query( 'CREATE TABLE IF NOT EXISTS loveworldnews (id INT(11) PRIMARY KEY AUTO_INCREMENT, Topic varchar( 255 ) NOT NULL, news text NOT NULL, highlights varchar (255) NOT NULL, published_date DATETIME DEFAULT CURRENT_TIMESTAMP)', function( err, results ){
+db.query( 'CREATE TABLE IF NOT EXISTS loveworldnews (id INT(11) PRIMARY KEY AUTO_INCREMENT, Topic varchar( 255 ) NOT NULL, link varchar( 255 ) NOT NULL, highlights varchar (255) NOT NULL, published_date DATETIME DEFAULT CURRENT_TIMESTAMP)', function( err, results ){
 	if( err ) throw err;
 	console.log( 'loveworldnews table created' );
 });

@@ -79,7 +79,7 @@ var sessionStore = new MySQLStore(options);
   
 app.set( 'trust proxy', 1 );
 
-var expiryDate = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
+//var expiryDate = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
 
 app.use(session({
   secret: 'the church loveworld nation we are kinging! yeah! i know who i am.',
@@ -90,7 +90,7 @@ app.use(session({
   cookie: {
     secure: true,
     httpOnly: true,
-    maxAge: expiryDate
+    //maxAge: expiryDate
 	}    
 }));
 
@@ -143,7 +143,7 @@ passport.use(new localStrategy(function(username, password, done){
 			const hash = results[0].password.toString();
 			bcrypt.compare(password, hash, function(err, response){
 				if (response === true){
-					console.log('good details')
+					//console.log('good details')
 					return done(null, {user_id: results[0].user_id});
 				}else{
 					console.log('false password')

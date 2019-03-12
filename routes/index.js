@@ -18,6 +18,7 @@ var url = require('url');
 var math = require( 'mathjs' );
 var formevents = require( '../functions/forms.js' );
 
+
 function rounds( err, results ){ 
 	if ( err ) throw err;
 }
@@ -81,7 +82,7 @@ router.get('/events',  function(req, res, next) {
 	db.query( 'SELECT event_name FROM events WHERE status = ?  ORDER BY id LIMIT 12',  ['upcoming'], function(err, results, fields){
 		if( err ) throw err;
 		var events = results;
-		res.render('events', {title: 'UP COMING EVENTS', csrfToken: req.csrfToken(), events: events});
+		res.render('events', {title: 'UP COMING EVENTS', events: events});
 	});
 });
 
@@ -253,9 +254,29 @@ router.post('/addadmin', parseForm, function (req, res, next) {
 	});
 });
 
+//add devotional
+router.post('/adddevotional', function (req, res, next) {
+	var topic = req.body.topic;
+	var date = req.body.date;
+	var description = req.body.description;
+	//check if it has been added  before
+	db.query('SELECT topic FROM devotional WHERE topic = ?', [topic], function(err, results, fields){
+		if( err ) throw err;
+		if(results.length > 0){
+			var error = 'You have added this topic before';
+			res.render('upload', {devoerror: error });
+		}else{
+			db.query('INSERT INTO devotional (news, topic, devotional_date) VALUES (?, ?, ?)', [description, topic, date], function(err,results, fields){
+				if (err)  throw err;
+				var success = 'New devotional added successfully';
+				res.render('upload', {devosuccess: success });
+			});
+		}
+	});
+});
 
 //delete admin
-router.post('/deladmin', parseForm,function (req, res, next) {
+router.post('/deladmin', function (req, res, next) {
 	var user = req.body.user;
 	db.query('SELECT user_id, username FROM user WHERE user_id = ?', [user], function(err, results, fields){
 		if( err ) throw err;
@@ -282,19 +303,28 @@ router.post('/deladmin', parseForm,function (req, res, next) {
 	});
 });
 
-
-router.post('/createEvent', parseForm, function(req, res, next) {
+router.post('/createEvent', function(req, res, next) {
 	//var category = req.body.category;
-	if (req.url == '/upload' && req.method.toLowerCase() == 'post') {
+	if (req.url == '/createEvent' && req.method.toLowerCase() == 'post') {
 		// parse a file upload
+		var sepa = ':';
 		var form = new formidable.IncomingForm();
-		form.uploadDir = '/Users/STAIN/desktop/sites//obionyi/public/images/events';
+		form.uploadDir = '/Users/STAIN/desktop/sites/church/public/images/events';
 		form.maxFileSize = 4 * 1024 * 1024;
-		form.parse(req, function(err, fields, files) { 
+		form.parse(req, function(err, fields, files) {
 			var Name = fields.name;
 			var venue = fields.venue;
-			var start = fields.start;
-			var stop = fields.stop;
+			var startdate = fields.startdate;
+			var starttime = fields.starttime;
+			
+			var start = startdate + ':' + starttime;
+			console.log(startdate);
+			var stopdate = fields.stopdate;
+			var stoptime = fields.stoptime;
+			
+			
+			var stop = stopdate + ':' + stoptime;
+			console.log(stop);
 			var description = fields.description;
 			console.log(fields);
 			var getfiles = JSON.stringify( files );
@@ -303,8 +333,8 @@ router.post('/createEvent', parseForm, function(req, res, next) {
 			//console.log(oldpath, typeof oldpath, typeof file, file.path, typeof file.path);
 			var name = file.img.name;
 			form.keepExtensions = true;
-			var newpath = '/Users/STAIN/desktop/sites/obionyi/public/images/samples/' + name;
-			var img = '/images/samples' + name;
+			var newpath = '/Users/STAIN/desktop/sites/church/public/images/events/' + name;
+			var img = '/Users/STAIN/desktop/sites/church/public/images/events/' + name;
 			form.on('fileBegin', function( name, file){
 				//rename the file
 				fs.rename(oldpath, newpath, function(err){
@@ -315,6 +345,51 @@ router.post('/createEvent', parseForm, function(req, res, next) {
 					db.query('INSERT INTO events (image, venue, status, start, stop, description, event_name) VALUES (?, ?, ?, ?, ?, ?, ?)', [img, venue, 'upcoming', start, stop, description, Name], function(err,results, fields){
 						if (err)  throw err;
 						res.render('upload', {title: 'ADMIN CORNER', createeventsuccess: 'Event Added'});
+					});
+			});
+			form.emit('fileBegin', name, file);
+	    });
+	}
+});
+
+
+router.post('/newmessage',  function(req, res, next) {
+	//var category = req.body.category;
+	if (req.url == '/newmessage' && req.method.toLowerCase() == 'post') {
+		// parse a file upload
+		var sepa = ':';
+		var form = new formidable.IncomingForm();
+		form.uploadDir = '/Users/STAIN/desktop/sites/church/public/images/messages/';
+		form.maxFileSize = 4 * 1024 * 1024;
+		form.parse(req, function(err, fields, files) {
+			var message = fields.messagetitle;
+			var minister = fields.minister;
+			var date = fields.date;
+			var time = fields.time;
+			var link = fields.link;
+			
+			var preaches = date + ':' + time;
+			
+			var description = fields.description;
+			console.log(fields);
+			var getfiles = JSON.stringify( files );
+			var file = JSON.parse( getfiles );
+			var oldpath = file.vid.path;
+			//console.log(oldpath, typeof oldpath, typeof file, file.path, typeof file.path);
+			var name = file.vid.name;
+			form.keepExtensions = true;
+			var newpath = '/Users/STAIN/desktop/sites/church/public/images/messages//' + name;
+			var img = '/Users/STAIN/desktop/sites/church/public/images/messages/' + name;
+			form.on('fileBegin', function( name, file){
+				//rename the file
+				fs.rename(oldpath, newpath, function(err){
+					if (err) throw err;
+					//console.log('file renamed');
+				});
+				//save in the database.
+					db.query('INSERT INTO messages (link, description, video, date_preached) VALUES (?, ?, ?, ?)', [link, description, img, preaches], function(err,results, fields){
+						if (err)  throw err;
+						res.render('upload', {title: 'ADMIN CORNER', messagesuccess: 'New Message Added'});
 					});
 			});
 			form.emit('fileBegin', name, file);
@@ -406,10 +481,10 @@ router.post('/register',  function (req, res, next) {
 	}
 });
 
-router.get('/404', function(req, res, next) {
+/*router.get('/404', function(req, res, next) {
   res.render('404', {title: 'PAGE NOT FOUND', message: 'Ooops  since you got lost somehow but i am here to catch you. see our quick links.'});
-});
+});*/
 router.get( '*', function ( req, res, next ){
-	res.redirect( '/404' )
+	res.redirect( '/' )
 });
 module.exports = router;
