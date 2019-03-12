@@ -2,7 +2,9 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
+var  csurf = require('csurf');
 var cookieParser = require('cookie-parser');
+var helmet = require('helmet');
 var logger = require('morgan');
 //var env  = require('dotenv').config();
 var hbs = require('express-handlebars');
@@ -34,6 +36,7 @@ var tables = require( './tables.js' );
 //var paginate = require('express-handlebars-paginate');
 var app = express();
 
+
  //view set up
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'hbs');
@@ -47,6 +50,13 @@ hbs.registerPartial('mainseo', mainseoTemplate);
 
 
 //middlewares.
+app.use(helmet({
+	frameguard: {
+
+    action: 'deny'
+
+}
+}));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -66,14 +76,30 @@ app.use(myConnection(mysql, options, 'pool'));
 
 var sessionStore = new MySQLStore(options);
   
+  
+app.set( 'trust proxy', 1 );
+
+var expiryDate = new Date(Date.now() + 60 * 60 * 1000) // 1 hour
+
 app.use(session({
-  secret: 'keybaby',
+  secret: 'the church loveworld nation we are kinging! yeah! i know who i am.',
   resave: false,
   store: sessionStore,
   saveUninitialized: false,
-  /**cookie:
-    #secure: true**/
-  }));
+  name: 'LoveWord',
+  cookie: {
+    secure: true,
+    httpOnly: true,
+    maxAge: expiryDate
+	}    
+}));
+
+app.use(csurf());
+
+app.use(function(req, res, next) {
+	res.locals._csrf = req.csrfToken();
+	next();
+});
 
   //passport
 app.use(passport.initialize());

@@ -5,8 +5,10 @@ var express = require('express');
 var router = express.Router();
 var ensureLoggedIn =  require('connect-ensure-login').ensureLoggedIn
 var util = require('util');
+var csrf = require('csurf');
 var securePin = require('secure-pin');
 var fs = require('fs');
+var bodyParser = require( 'body-parser' );
 var passport = require('passport');
 var db = require('../db.js'); 
 var bcrypt = require('bcrypt-nodejs');
@@ -19,6 +21,10 @@ var formevents = require( '../functions/forms.js' );
 function rounds( err, results ){ 
 	if ( err ) throw err;
 }
+var csrfProtection = csrf({ cookie: true })
+
+var parseForm = bodyParser.urlencoded({ extended: false })
+
 const saltRounds = bcrypt.genSalt( 10, rounds);
 
 
@@ -40,27 +46,27 @@ router.get('/',  function(req, res, next) {
 		var events = results;
 		var urgentEvent = results[0];
 		//get the top national news.
-		db.query( 'SELECT * FROM national_news ORDER BY id DESC LIMIT 3',  function(err, results, fields){
+		db.query( 'SELECT * FROM nationalnews ORDER BY id DESC LIMIT 3',  function(err, results, fields){
 			if( err ) throw err;
 			var NationalNews = results;
 			var topNational = results[0];
 			db.query( 'SELECT * FROM loveworldnews ORDER BY id DESC LIMIT 3', function(err, results, fields){
 				if( err ) throw err;
-				var NationalNews = results;
+				var loveworld = results;
 				var toploveWorld = results[0];
 				db.query( 'SELECT * FROM messages ORDER BY id DESC LIMIT 3', function(err, results, fields){
 					if( err ) throw err;
-					var NationalNews = results;
-					db.query( 'SELECT affirmation_date, topic FROM affirmation ORDER BY id DESC LIMIT 7', function(err, results, fields){
+					var messages = results;
+					db.query( 'SELECT affirmation_date, topic FROM affirmation ORDER BY affirmation_date DESC LIMIT 7', function(err, results, fields){
 						if( err ) throw err;
 						var affirmation = results;
-						db.query( 'SELECT devotional_date, topic FROM devotional ORDER BY id DESC LIMIT 7', function(err, results, fields){
+						db.query( 'SELECT devotional_date, topic FROM devotional ORDER BY devotional_date DESC LIMIT 7', function(err, results, fields){
 							if( err ) throw err;
 							var devotional = results;
-							db.query( 'SELECT * FROM quotes ORDER BY id DESC LIMIT 1', function(err, results, fields){
+							db.query( 'SELECT * FROM quotes ORDER BY entered DESC LIMIT 1', function(err, results, fields){
 								if( err ) throw err;
 								var quotes = results
-								res.render('index', {title: "LOVEWORLD", quotes: quotes, affirmation: affirmation, devotional: devotional, urgentEvent: urgentEvent, events: events, messages:messages, topNational: topNational, toploveWorld: toploveWorld, nationalNews: NationalNews});
+								res.render('index', {title: "LOVEWORLD", quotes: quotes, affirmation: affirmation, devotional: devotional, urgentEvent: urgentEvent, events: events, loveworld: loveworld, messages:messages, topNational: topNational, toploveWorld: toploveWorld, nationalNews: NationalNews});
 							});
 						});
 					});
@@ -71,7 +77,7 @@ router.get('/',  function(req, res, next) {
 });
 
 //get events 
-router.get('/joinevent',  function(req, res, next) {
+router.get('/events',  function(req, res, next) {
 	db.query( 'SELECT event_name FROM events WHERE status = ?  ORDER BY id LIMIT 12',  ['upcoming'], function(err, results, fields){
 		if( err ) throw err;
 		var events = results;
@@ -163,6 +169,18 @@ router.post('/status', function(req, res, next) {
 
 //post search.
 router.post('/joinevent', function(req, res, next) {
+	req.checkBody('username', 'Username must be between 8 to 25 characters').len(8,25);
+	req.checkBody('fullname', 'Full Name must be between 8 to 25 characters').len(8,25);
+	req.checkBody('pass1', 'Password must be between 8 to 25 characters').len(8,100);
+	req.checkBody('pass2', 'Password confirmation must be between 8 to 100 characters').len(8,100);
+	req.checkBody('email', 'Email must be between 8 to 105 characters').len(8,105);
+	req.checkBody('email', 'Invalid Email').isEmail();
+	req.checkBody('code', 'Country Code must not be empty.').notEmpty();
+	req.checkBody('pass1', 'Password must match').equals(req.body.pass2);
+	req.checkBody('phone', 'Phone Number must be ten characters').len(10);
+	req.checkBody('address', 'Address must be 200 characters').len(200);
+	req.checkBody( 'phone', 'Phone Number should be a Number' ).isNumeric( );
+	
 	db.query( 'SELECT phone FROM attendance WHERE phone = ? and event_name = ?', [phone, event_name], function ( err, results, fields ){
 		if(err) throw err;
 		if (results.length > 0){
@@ -343,6 +361,7 @@ router.post('/register', function (req, res, next) {
 	req.checkBody('pass1', 'Password must match').equals(req.body.pass2);
 	req.checkBody('phone', 'Phone Number must be ten characters').len(10);
 	req.checkBody('address', 'Address must be 200 characters').len(200);
+	req.checkBody( 'phone', 'Phone Number should be a Number' ).isNumeric( );
 	
 	var username = req.body.username;
 	var password = req.body.pass1;

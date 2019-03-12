@@ -1,7 +1,7 @@
-/*var db = require( './db.js' );
+var db = require( './db.js' );
 
 //create events table
-db.query( 'CREATE TABLE IF NOT EXISTS events ( id INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL, status varchar (255) NOT NULL, event_name varchar( 255 ) NOT NULL, start DATETIME NOT NULL, stot DATETIME NOT NULL, venue varchar( 255 ) NOT NULL, image varchar ( 255 ) NOT NULL, description text NOT NULL )', function( err, results ){
+db.query( 'CREATE TABLE IF NOT EXISTS events ( id INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL, status varchar (255) NOT NULL, event_name varchar( 255 ) NOT NULL, start DATETIME NOT NULL, stop DATETIME NOT NULL, venue varchar( 255 ) NOT NULL, image varchar ( 255 ) NOT NULL, description text NOT NULL )', function( err, results ){
 	if( err ) throw err;
 	console.log( 'events table created' );
 });
@@ -33,17 +33,17 @@ db.query( 'CREATE TABLE IF NOT EXISTS affirmation (topic varchar( 255 ) NOT NULL
 	console.log( 'affirmation table created' );
 });
 
-db.query( 'CREATE TABLE IF NOT EXISTS quotes (speaker varchar( 255 ) NOT NULL, quotes text NOT NULL)', function( err, results ){
+db.query( 'CREATE TABLE IF NOT EXISTS quotes (speaker varchar( 255 ) NOT NULL, quotes text NOT NULL, entered DATETIME DEFAULT CURRENT_TIMESTAMP)', function( err, results ){
 	if( err ) throw err;
 	console.log( 'quotes table created' );
 });
 
-db.query( 'CREATE TABLE IF NOT EXISTS loveworldnews (Topic varchar( 255 ) NOT NULL, news text NOT NULL, highlights varchar (255) NOT NULL, published_date DATETIME DEFAULT CURRENT_TIMESTAMP)', function( err, results ){
+db.query( 'CREATE TABLE IF NOT EXISTS loveworldnews (id INT(11) PRIMARY KEY AUTO_INCREMENT, Topic varchar( 255 ) NOT NULL, news text NOT NULL, highlights varchar (255) NOT NULL, published_date DATETIME DEFAULT CURRENT_TIMESTAMP)', function( err, results ){
 	if( err ) throw err;
 	console.log( 'loveworldnews table created' );
 });
 
-db.query( 'CREATE TABLE IF NOT EXISTS nationalnews (Topic varchar( 255 ) NOT NULL, link varchar (255) NOT NULL, news text NOT NULL, published_date DATETIME DEFAULT CURRENT_TIMESTAMP)', function( err, results ){
+db.query( 'CREATE TABLE IF NOT EXISTS nationalnews (id INT(11) PRIMARY KEY AUTO_INCREMENT, Topic varchar( 255 ) NOT NULL, link varchar (255) NOT NULL, news text NOT NULL, published_date DATETIME DEFAULT CURRENT_TIMESTAMP)', function( err, results ){
 	if( err ) throw err;
 	console.log( 'national news created' );
 });
@@ -58,5 +58,3 @@ db.query( user, function( err, results ){
 	if( err ) throw err;
 	console.log( 'user table created' );
 });
-
-*/

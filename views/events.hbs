@@ -38,13 +38,25 @@ never share your email with anyone else.</small>
   <input type="tel" class="form-control" id="phone" name ="phone" placeholder="e.g 2348012345678" value="{{phone}}"  required />
 </div>
 <div class="form-group">
+<label for = "events"> Event Name </label>
 				<select class = "form-control" name = "parent">
-					<option><option>
-					{{#if category}}
-					{{#each category}}
-						<option>{{category_name}}</option>
+					{{#if events}}
+					{{#each events}}
+						<option>{{event_name}}</option>
 						{{/each}}
 					{{/if}}
 				</select>
 		</div>
+		<div class = "form-group">
+    <label for="KingsChat">Kings Chat</label>
+  <input type="text" class="form-control" id="kingschat" name ="kingschat" placeholder="Kings Chat Profile Link" value=""  required />
+</div>
+
+<div class = "form-group">
+    <label for="WhatsApp"> WhatsApp</label>
+  <input type="text" class="form-control" id="whatsapp" name ="whatsapp" placeholder="WhatsApp Details" value=""  required />
+</div>
+<br>
+<div class="form-group"> <button type="submit" class="btn  btn-success">Submit</button> 
  </form>
+ </div>
