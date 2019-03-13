@@ -8,7 +8,14 @@
     {{success}}
   </div>
   {{/if}}
-  
+  {{#if errors}}
+  {{#each errors}}
+  <div class="alert alert-danger">
+    {{this.msg}}
+  </div>
+  {{/each}}
+{{/if}}
+
   <div class = "container">
     <div class="text-center"> 
     
@@ -17,6 +24,7 @@
  </div>
  
  <form method ="POST" action ="/joinevent">
+ <input type="hidden" name="_csrf" value="{{csrfToken}}">
 	<div class="form-group">
     <label for="fullname">Full Name</label>
     <input type="text" class="form-control"  
@@ -39,7 +47,7 @@ never share your email with anyone else.</small>
 </div>
 <div class="form-group">
 <label for = "events"> Event Name </label>
-				<select class = "form-control" name = "parent">
+				<select class = "form-control" name = "events">
 					{{#if events}}
 					{{#each events}}
 						<option>{{event_name}}</option>

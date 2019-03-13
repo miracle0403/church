@@ -1,127 +1,52 @@
-<div class = "container-fluid text-center text-white bg bg-secondary">
-<section class = "container">
-<hr>
-<h3 class = "h3" id = "h3"><b>ADD CATEGORIES</b></h3><hr>
-</section>
-</div>
-<div class = "container-fluid">
+<h3 class = "h3 text-center text-success" id = "h3"><b>{{TITLE}}</b></h3>
+
+
 <div class = "row">
-<div class = "col-md-6">
-<h5 class = "h5"><b>ADD NEW PARENT CATEGORY</b></h5>
-{{#if parenterror}}
-<div class = "alert alert-danger">
-{{parenterror}}
-</div>
-{{/if}}
-{{#if parent}}
-<div class = "alert alert-success">
-{{parent}}
-</div>
-{{/if}}
-	<form method ="POST"  action ="/newcat">
-		<div class="container-fluid"> 	
-			<div class="form-group">
-				<label for="category">Category</label>
-				<input type="text" class="form-control" id="newcat" name ="category" placeholder="Enter new category here" required />
-			</div><br>
-			<div class="form-group">
-				<button type="submit" class="btn btn-danger">Submit</button><br><br>
-			</div>
+	<div class = "col-md-6">
+		<h3 class = "h5 text-center text-success" id = "h5"><b>CREATE NEW EVENT</b></h5>
+		{{#if createeventsuccess}}
+		<div class = "alert alert-success">
+		{{createeventsuccess}}
 		</div>
-	</form>
-
-</div>
-<div></div>
-<div class = "col-md-6">
-<h5 class = "h5"><b>ADD NEW CHILD CATEGORY</b></h5>
-{{#if childerror}}
-<div class = "alert alert-danger">
-{{childerror}}
-</div>
-{{/if}}
-{{#if childsuccess}}
-<div class = "alert alert-success">
-{{childsuccess}}
-</div>
-{{/if}}
-<form method ="POST" action ="/addcategory">
-		<div class="container-fluid">
-		<div class = "row">
-		<div class = "col">
-		<div class="form-group">
-		<label for="category">Parent Category</label>
+		{{/if}}
+		{{#if createeventerror}}
+		<div class = "alert alert-error">
+		{{createeventerror}}
 		</div>
-		<div class="form-group">
-				<select class = "form-control" name = "parent">
-					<option><option>
-					{{#if category}}
-					{{#each category}}
-						<option>{{category_name}}</option>
-						{{/each}}
-					{{/if}}
-				</select>
-		</div>
-		</div>
-		<div class = "col">
-		
-		<div class="form-group">
-			
-				<label for="category">Child Category</label>
-				</div>
-				<div class=" form-group">
-				<input type="text" class="form-control" id="newcat" name ="category" placeholder="Enter category here" required />
-			</div>
-			</div>
-			</div>
-			<div class="form-group">
-				<button type="submit" class="btn btn-danger">Submit</button><br><br>
-			</div>
-		</div>
-		</div>
-		
-		</div>
-	
-		
-		</form>
-		<!-- end of first column -->
-	</div>
-
-<!-- end of first row-->
-</div>
- <div class = "container text-white bg bg-danger">
- <hr>
-	<h3 class = "h3"><b>ADD NEW PRODUCT<b></h3><hr>
-	{{#if uploadsuccess}}
-	<div class = "alert alert-success">
-	{{uploadsuccess}}
-	</div>
-	{{/if}}
-	</div>
-	<!---->
-	<form method ="POST" enctype="multipart/form-data" id = "formupload"  action ="/upload">
+		{{/if}}
+			<form method ="POST" enctype="multipart/form-data" id = "formupload"  action ="/createevent">
 		<div class="container-fluid"> 	
 		<div class = "form-row">
-			<div class="form-group col-md-6">
-				<label for="category">Category</label>
-				<select class = "form-control" name = "category">
-					{{#if category}}
-					{{#each category}}
-						<option>{{category_name}}</option>
-						{{/each}}
-					{{/if}}
-				</select>
+		<div class="form-group col-md-6">
+				<label for="event">Event Name</label>
+				<input type="text" class="form-control" id="name" name ="name" placeholder="Enter Event name here" required />
 			</div>
 			<div class="form-group col-md-6">
-				<label for="product">Product</label>
-				<input type="text" class="form-control" id="product" name ="product" placeholder="Enter product here" required />
+				<label for="venue">Venue</label>
+				<input type="text" class="form-control" id="venue" name ="venue" value="Enter Venue" required />
 			</div>
 			</div>
 			<div class = "form-row">
 			<div class="form-group col-md-6">
-				<label for="price">Price</label>
-				<input type="text" class="form-control" id="price" name ="price" value="Contact for price" required />
+				<label for="startevent">Start Event</label>
+				<input type="date" class="form-control" id="startdate" name ="start" value="Enter Start Date" required />
 			</div>
 			<div class="form-group col-md-6">
+				<label for="startevent">Start Event</label>
+				<input type="time" class="form-control" id="starttime" name ="starttime" value="Enter Start Time" required />
+			</div>
+			</div>
+			<div class = "form-row">
+			<div class="form-group col-md-6">
+				<label for="startevent">Stop Event</label>
+				<input type="date" class="form-control" id="startdate" name ="start" value="Enter Start Date" required />
+			</div>
+			<div class="form-group col-md-6">
+				<label for="startevent">Stop Event</label>
+				<input type="time" class="form-control" id="starttime" name ="starttime" value="Enter Start Time" required />
+			</div>
+			</div>
+			<div class="form-group">
 			<div id = "pic"></div>
 				<label for="img">Product Image</label>
 				<input type="file" class="form-control-file" id="Picture" name ="img" placeholder="Click here" required />
@@ -133,142 +58,150 @@
 		<img src = "" class = "img-fluid" id ="imagepic">
 		</div>						-->
 			<div class="form-group">
-				<label for="description">Product Description</label>
+				<label for="description">Event Description</label>
 				<textarea class="form-control" id="description" rows = "6" name ="description" placeholder="Enter description here"></textarea>
 			</div>
 			<div class="form-group">
-				<button type="submit" class="btn btn-secondary">Submit</button>
+				<button type="submit" class="btn btn-success">Submit</button>
 				<span id = "status"></status>
 				<br><br>
 			</div>
-		</div>
-		</form>
-		<div class = "row">
-		<div class = "col-md-6">
-		<div class = "container text-white bg bg-danger text-center">
-		<hr>
-		<h3><b>UPDATE PRODUCT STATUS</b></h3><hr>
-		</div>
-		{{#if statussuccess}}
-		<div id = "stats" class = " container alert alert-success">
-		{{statussuccess}}
-		</div>
-		{{/if}}
-		<form method ="POST" action ="/status">
-		<div class="container-fluid">
-		<div class = "form-row">
-			<div class="form-group col-md-6">
-				<label for="product">Id Number</label>
-				<input type="number" class="form-control" id="product_id" name ="id" placeholder="Enter product_id" required />
-			</div>
-			<div class="form-group col-md-6">
-			<label for="status">Status</label>
-				<select class = "form-control" name = "status">
-					
-					<option>In stock</option>
-					<option>Out of stock</option>
-				</select>
-			</div>
-			</div>
-			<div class="form-group">
-				<button id = "update" type="submit" class="btn btn-secondary">Submit</button>
-				</div>
-		</div>
-	</form>
-		</div>
-		<div class = "col-md-6">
-		<div class = "container text-white
-	 bg bg-secondary text-center">
-		<hr>
-		<h3 class = "h3"><b>SEARCH PRODUCT</b></h3><hr>
-		</div>
-		<div class = "container">
-	{{#if searchresults}}
-	{{#each searchresults}}
-	Product name: {{product_name}}<br>
-	Product Id: {{product_id}}<br>
-	ID Number: {{id}}<br>
-	Status: {{status}}<br>
-	Price: {{price}}<br>
-	{{/each}}
-	{{/if}}
-	</div>
-	<form method ="POST" action ="/searchproduct">
-		<div class="container-fluid"> 	
-			<div class="form-group">
-				<label for="product">Product_id</label>
-				<input type="number" class="form-control" id="product_id" name ="product_id" placeholder="Enter product_id" required />
-			</div>
-			<div class="form-group">
-				<button type="submit" class="btn btn-danger">Submit</button><br><br>
-			</div>
-		</div>	
-	</form>
-	
-		</div>
-		</div>
-			<!-- add admin and delete admin -->
-			
-			<div class = "row">
-		<div class = "col-md-6">
-		<div class = "container text-white bg bg-danger text-center">
-		<hr>
-		<h3><b>ADD ADMIN</b></h3><hr>
-		</div>
-		{{#if addsuccess}}
-		<div id = "stats" class = " container alert alert-success">
-		{{addsuccess}}
-		</div>
-		{{/if}}
-		{{#if adderror}}
-		<div id = "stats" class = " container alert alert-danger">
-		{{adderror}}
-		</div>
-		{{/if}}
-		<form method ="POST" action ="/addadmin">
-		<div class="container-fluid">
 		
-			<div class="form-group ">
-				<label for="addadmin">User Id</label>
-				<input type="number" class="form-control" id="user" name ="user" placeholder="Enter user id" required />
+		</form>
+	</div>
+	
+	
+	<div class = "col-md-6">
+		<h3 class = "h5 text-center text-success" id = "h5"><b>ADD NEW MESSAGE</b></h5>
+		{{#if messagesuccess}}
+		<div class = "alert alert-success">
+		{{messagesuccess}}
+		</div>
+		{{/if}}
+		<form method ="POST" enctype="multipart/form-data" id = "formupload"  action ="/newmessage">
+		<div class="container-fluid"> 	
+		<div class = "form-row">
+		<div class="form-group col-md-6">
+				<label for="event">Message Title</label>
+				<input type="text" class="form-control" id="name" name ="messagetitle" placeholder="Enter Event Title here" required />
+			</div>
+			<div class="form-group col-md-6">
+				<label for="venue">Minister</label>
+				<input type="text" class="form-control" id="venue" name ="minister" value="Enter Minister's Name" required />
+			</div>
 			</div>
 			
 			<div class="form-group">
-				<button type="submit" class="btn btn-secondary">Submit</button>
-				</div>
-	</div>
-	</form>
-		</div>
-		<div class = "col-md-6">
-		<div class = "container text-white
-	 bg bg-secondary text-center">
-		<hr>
-		<h3 class = "h3"><b>DELETE ADMIN</b></h3><hr>
-		</div>
-		<div class = "container">
-	{{#if adminsuccess}}
-		<div id = "stats" class = " container alert alert-success">
-		{{adminsuccess}}
-		</div>
-		{{/if}}
-		{{#if adminerror}}
-		<div id = "stats" class = " container alert alert-danger">
-		{{adminerror}}
-		</div>
-		{{/if}}
-	</div>
-	<form method ="POST" action ="/deladmin">
-		<div class="container-fluid"> 	
-			<div class="form-group">
-				<label for="product">User id</label>
-				<input type="number" class="form-control" id="user id" name ="user" placeholder="Enter user id" required />
+				<label for="startevent">Date Preached</label>
+				<input type="date" class="form-control" id="date" name ="date" value="Enter Start Date" required />
 			</div>
 			<div class="form-group">
-				<button type="submit" class="btn btn-danger">Submit</button><br><br>
+				<label for="startevent">Time Preached</label>
+				<input type="time" class="form-control" id="time" name ="time" value="Enter Start Time" required />
+			</div>
+		
+			<div class="form-group">
+			<div id = "pic"></div>
+				<label for="vid">Promo Video</label>
+				<input type="file" class="form-control-file" id="vid" name ="vid" placeholder="Click here" required />
+				</div><br>
+	
+		<!--
+		<div class = "form-group">
+		<img src = "" class = "img-fluid" id ="imagepic">
+		</div>						-->
+			<div class="form-group">
+				<label for="description">Short Message</label>
+				<textarea class="form-control" id="description" rows = "6" name ="description" placeholder="Enter description here"></textarea>
+			</div>
+			<div class="form-group">
+				<button type="submit" class="btn btn-success">Submit</button>
+				<span id = "status"></status>
+				<br><br>
+			</div>
+		
+		</form>
+	</div>
+</div>
+</div>
+<br>
+<div class = "row">
+	<div class = "col-md-6">
+	<h3 class = "h5 text-center text-success" id = "h5"><b>DEVOTIONAL</b></h5>
+	<form method ="POST" action ="/adddevotional">
+			<div class = "row">
+			<div class="form-group col-md-6">
+				<label for="product">Topic</label>
+				<input type="text" class="form-control" id="topic" name ="topic" placeholder="Enter Topic" required />
+			</div>
+			<div class="form-group col-md-6">
+				<label for="date">Date</label>
+				<input type="date" class="form-control" id="topic" name ="date" placeholder="Enter Date" required />
+			</div>
+			</div>
+			<div class="form-group">
+				<label for="description">Message</label>
+				<textarea class="form-control" id="description" cols = "15" rows = "8" name ="description" placeholder="Enter description here"></textarea>
+			</div>
+			<div class="form-group">
+				<button type="submit" class="btn btn-success">Submit</button><br><br>
 			</div>
 		</div>	
+	</form>
+	<div class = "col-md-6">
+	<h3 class = "h5 text-center text-success" id = "h5"><b>AFFIRMATION</b></h5>
+	<form method ="POST" action ="/addaffirmation">
+			<div class = "row">
+			<div class="form-group col-md-6">
+				<label for="product">Topic</label>
+				<input type="text" class="form-control" id="topic" name ="topic" placeholder="Enter Topic" required />
+			</div>
+			<div class="form-group col-md-6">
+				<label for="date">Date</label>
+				<input type="date" class="form-control" id="topic" name ="date" placeholder="Enter Date" required />
+			</div>
+			</div>
+			<div class="form-group">
+				<label for="description">Message</label>
+				<textarea class="form-control" id="description" cols = "15" rows = "8" name ="description" placeholder="Enter description here"></textarea>
+			</div>
+			<div class="form-group">
+				<button type="submit" class="btn btn-success">Submit</button><br><br>
+			</div>
+		</div>	
+	</form>
+	</div>
+
+<div class = "row">
+	<div class = "col-md-6">
+	<form method ="POST" action ="/addLWnews">
+			<div class = "row">
+			<div class="form-group col-md-4">
+				<label for="product">Topic</label>
+				<input type="text" class="form-control" id="topic" name ="topic" placeholder="Enter Topic" required />
+			</div>
+			<div class="form-group col-md-3">
+				<label for="date">Date</label>
+				<input type="date" class="form-control" id="topic" name ="date" placeholder="Enter Date" required />
+			</div>
+			<div class="form-group col-md-5">
+				<label for="link">Link</label>
+				<input type="text" class="form-control" id="link" name ="link" placeholder="Enter Link" required />
+			</div>
+			</div>
+			<div class="form-group">
+				<label for="description">Message</label>
+				<textarea class="form-control" id="description" cols = "15" rows = "8" name ="description" placeholder="Enter description here"></textarea>
+			</div>
+			<div class="form-group">
+				<button type="submit" class="btn btn-success">Submit</button><br><br>
+			</div>
+		</div>	
+	</form>
+	</div>
+	<div class = "col-md-6">
+	</div>
+</div>
 	
 	
-		</div>
-		</div>
-			
+	</div>

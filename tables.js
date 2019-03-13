@@ -13,7 +13,7 @@ db.query( 'CREATE TABLE IF NOT EXISTS attendance (event_name varchar( 255 ) NOT 
 });
 
 //create events table
-db.query( 'CREATE TABLE IF NOT EXISTS messages ( id INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL, link varchar(255) NOT NULL, event_date DATETIME NOT NULL, date_preached DATETIME NOT NULL, video varchar ( 255 ) NOT NULL, description text NOT NULL )', function( err, results ){
+db.query( 'CREATE TABLE IF NOT EXISTS messages ( id INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL, link varchar(255) NOT NULL, date_preached DATETIME NOT NULL, video varchar ( 255 ) NOT NULL, description text NOT NULL )', function( err, results ){
 	if( err ) throw err;
 	console.log( 'messages table created' );
 });
@@ -23,7 +23,7 @@ db.query( 'CREATE TABLE IF NOT EXISTS news (topic varchar( 255 ) NOT NULL, descr
 	console.log( 'news table created' );
 });
 
-db.query( 'CREATE TABLE IF NOT EXISTS devotional (Topic varchar( 255 ) NOT NULL, devotional_date DATETIME NOT NULL, news text NOT NULL)', function( err, results ){
+db.query( 'CREATE TABLE IF NOT EXISTS devotional (Topic varchar( 255 ) NOT NULL, devotional_date DATETIME NOT NULL, devotional text NOT NULL)', function( err, results ){
 	if( err ) throw err;
 	console.log( 'devotional table created' );
 })

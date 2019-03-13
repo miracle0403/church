@@ -81,7 +81,7 @@ router.get('/events',  function(req, res, next) {
 	db.query( 'SELECT event_name FROM events WHERE status = ?  ORDER BY id LIMIT 12',  ['upcoming'], function(err, results, fields){
 		if( err ) throw err;
 		var events = results;
-		res.render('events', {title: 'UP COMING EVENTS', events: events});
+		res.render('events', {title: 'UP COMING EVENTS', csrfToken: req.csrfToken(), events: events});
 	});
 });
 
@@ -111,12 +111,8 @@ router.get('/affirmation/:topic',  function(req, res, next) {
 router.get('/admin', ensureLoggedIn('/login'), function(req, res, next) {
 	//get the category.
 	var currentUser = req.session.passport.user.user_id;
-	admin(currentUser, db, res);
-	db.query('SELECT category_name FROM category', function(err, results, fields){
-		if(err) throw err;
-		var category = results;
-		res.render('upload', {title: 'ADMIN CORNER', category: category});
-	});
+	//admin(currentUser, db, res);
+	res.render('upload',  { title: 'ADMIN CORNER'});
 });
 
 
@@ -136,10 +132,10 @@ router.get('/login', function(req, res, next) {
 
 
 //register get request
-router.get('/register', function(req, res, next) {	
+router.get('/register',  function(req, res, next) {	
     res.render('register',  { title: 'REGISTRATION'});
 });
-
+//csrfToken: req.csrfToken()
 //get logout
 router.get('/logout', function(req, res, next) {
   req.logout();
@@ -157,10 +153,10 @@ passport.deserializeUser(function(user_id, done){
 });
 
 //post add status.
-router.post('/status', function(req, res, next) {
+router.post('/eventstatus', function(req, res, next) {
 	var status = req.body.status;
 	var id = req.body.id;
-	db.query( 'UPDATE products SET status  = ? WHERE id = ?', [status, id], function ( err, results, fields ){
+	db.query( 'UPDATE events SET status  = ? WHERE id = ?', [status, id], function ( err, results, fields ){
 		if(err) throw err;
 		res.render('upload', {title: 'ADMIN CORNER', statussuccess: 'Update was successful'});
 	});
@@ -168,60 +164,69 @@ router.post('/status', function(req, res, next) {
 
 
 //post search.
-router.post('/joinevent', function(req, res, next) {
-	req.checkBody('username', 'Username must be between 8 to 25 characters').len(8,25);
-	req.checkBody('fullname', 'Full Name must be between 8 to 25 characters').len(8,25);
-	req.checkBody('pass1', 'Password must be between 8 to 25 characters').len(8,100);
-	req.checkBody('pass2', 'Password confirmation must be between 8 to 100 characters').len(8,100);
+router.post('/joinevent', parseForm, function(req, res, next) {
+	req.checkBody('fullname', 'Full Name must be between 8 to 25 characters').len(8,100);
+	req.checkBody('address', 'Address must be between 10 to 100 characters').len(10,100);
+	req.checkBody('whatsapp', 'WhatsApp must be between 8 to 25 characters').len(8,100);
+	req.checkBody('kingschat', 'Kings Chat must be between 10 to 100 characters').len(10,100);
 	req.checkBody('email', 'Email must be between 8 to 105 characters').len(8,105);
 	req.checkBody('email', 'Invalid Email').isEmail();
-	req.checkBody('code', 'Country Code must not be empty.').notEmpty();
-	req.checkBody('pass1', 'Password must match').equals(req.body.pass2);
-	req.checkBody('phone', 'Phone Number must be ten characters').len(10);
-	req.checkBody('address', 'Address must be 200 characters').len(200);
-	req.checkBody( 'phone', 'Phone Number should be a Number' ).isNumeric( );
+	req.checkBody('phone', 'Phone Number must be 14 characters').len(14);
+	req.checkBody( 'phone', 'Phone Number should be a Number' ).isMobilePhone();
 	
-	db.query( 'SELECT phone FROM attendance WHERE phone = ? and event_name = ?', [phone, event_name], function ( err, results, fields ){
-		if(err) throw err;
-		if (results.length > 0){
-			var error = 'We think you have indicated interest to attend this event already and we reserved a special place fir you.';
-			res.render('events', {title: 'Up Coming Events', error: error});
-		}else{
-			var success = 'You are good to go! See you at ' + event_name;
-			res.render('events', {title: 'Up Coming Events', success: success});
-		}
-	});
+	req.sanitizeBody('fullname').trim().escape();
+	req.sanitizeBody('address').trim().escape();
+	req.sanitizeBody('whatsapp').trim().escape();
+	req.sanitizeBody('kingschat').trim().escape();
+	req.sanitizeBody('phone').trim().escape();
+	req.sanitizeBody('email').trim().escape();
+	
+	var address = req.body.address;
+	var email = req.body.email;
+	var fullname = req.body.fullname;
+	var phone = req.body.phone;
+	var events = req.body.events;
+	var wa = req.body.whatsapp;
+	var ks = req.body.kingschat;
+	
+	var errors = req.validationErrors();
+	if (errors) { 
+	
+		console.log(JSON.stringify(errors));
+  
+		res.render('events', { title: 'REGISTRATION FAILED', errors: errors});
+	}else{
+		db.query( 'SELECT phone FROM attendance WHERE phone = ? and event_name = ?', [phone, events], function ( err, results, fields ){
+			if(err) throw err;
+			if (results.length > 0){
+				var error = 'We think you have indicated interest to attend this event already and we reserved a special place fir you.';
+				res.render('events', {title: 'Up Coming Events', error: error});
+			}else{
+				db.query( 'SELECT start FROM events WHERE event_name = ?', [events], function ( err, results, fields ){
+					if(err) throw err;
+					var start = results[0].start;
+					db.query('INSERT INTO attendance (event_name, event_date, address, phone, email, whatsapp, kingschat) VALUES (?, ?, ?, ?, ?, ?, ?)', [events, start, address, phone, email, whatsapp, kingschat], function(err,results, fields){
+						if (err)  throw err;
+						//insert into database
+						var success = 'You are good to go!' + fullname + 'See you at ' + event_name;
+						res.render('events', {title: 'Up Coming Events', success: success});
+					});
+				});
+			}
+		});
+	}
 });
 
-
-//post add new category never existed.
-router.post('/newcat', function(req, res, next) {
-	var category = req.body.category;
-	db.query( 'SELECT category_name FROM category WHERE category_name  = ?', [category], function ( err, results, fields ){
-	console.log( results )
-		if ( results.length > 0 ){
-			var error = 'This category exists already';
-			res.render( 'upload', {title: 'ADD CATEGORY FAILED', parenterror: error});
-		}else{
-			db.query('CALL newcat (?)', [category], function(err, results, fields){
-				if (err) throw err;
-				var parent = 'Category added.';
-				var success = ' New category added successfully';
-				res.render('upload', { title: 'IFEYSAMUEL VENTURES', parent: success});
-			});
-		}
-	});
-});
 
 //post log in
-router.post('/login', passport.authenticate('local', {
+router.post('/login', parseForm, passport.authenticate('local', {
   failureRedirect: '/login',
   successReturnToOrRedirect: '/admin',
   failureFlash: true
 }));
 
 //add new admin
-router.post('/addadmin', function (req, res, next) {
+router.post('/addadmin', parseForm, function (req, res, next) {
 	var user = req.body.user;
 	db.query('SELECT user_id, username FROM user WHERE user_id = ?', [user], function(err, results, fields){
 		if( err ) throw err;
@@ -250,7 +255,7 @@ router.post('/addadmin', function (req, res, next) {
 
 
 //delete admin
-router.post('/deladmin', function (req, res, next) {
+router.post('/deladmin', parseForm,function (req, res, next) {
 	var user = req.body.user;
 	db.query('SELECT user_id, username FROM user WHERE user_id = ?', [user], function(err, results, fields){
 		if( err ) throw err;
@@ -277,28 +282,8 @@ router.post('/deladmin', function (req, res, next) {
 	});
 });
 
-//post add category 
-router.post('/addcategory',  function(req, res, next) {
-	var category = req.body.category;
-	var parent = req.body.parent;
-	console.log( req.body );
-	db.query( 'SELECT category_name FROM category WHERE category_name  = ?', [parent], function ( err, results, fields ){
-	console.log( results )
-		if ( results.length > 0 ){
-			var error = 'This category exists already';
-			res.render( 'upload', {title: 'ADD CATEGORY FAILED', childerror: error});
-		}else{
-			db.query('CALL addnewcategory (?, ?)', [parent, category], function(err, results, fields){
-				if (err) throw err;
-				var success = 'Category added.';
-				res.render('upload', { title: 'IFEYSAMUEL VENTURES', childsuccess: success});
-			});		
-		}
-	});
-});
 
-
-router.post('/createEvent', function(req, res, next) {
+router.post('/createEvent', parseForm, function(req, res, next) {
 	//var category = req.body.category;
 	if (req.url == '/upload' && req.method.toLowerCase() == 'post') {
 		// parse a file upload
@@ -329,7 +314,7 @@ router.post('/createEvent', function(req, res, next) {
 				//save in the database.
 					db.query('INSERT INTO events (image, venue, status, start, stop, description, event_name) VALUES (?, ?, ?, ?, ?, ?, ?)', [img, venue, 'upcoming', start, stop, description, Name], function(err,results, fields){
 						if (err)  throw err;
-						res.render('upload', {title: 'ADMIN CORNER', uploadsuccess: 'Event Added'});
+						res.render('upload', {title: 'ADMIN CORNER', createeventsuccess: 'Event Added'});
 					});
 			});
 			form.emit('fileBegin', name, file);
@@ -350,7 +335,7 @@ passport.deserializeUser(function(user_id, done){
 
 //post the register
 //var normal = require( '../functions/normal.js' );
-router.post('/register', function (req, res, next) {
+router.post('/register',  function (req, res, next) {
 	req.checkBody('username', 'Username must be between 8 to 25 characters').len(8,25);
 	req.checkBody('fullname', 'Full Name must be between 8 to 25 characters').len(8,25);
 	req.checkBody('pass1', 'Password must be between 8 to 25 characters').len(8,100);
@@ -359,10 +344,21 @@ router.post('/register', function (req, res, next) {
 	req.checkBody('email', 'Invalid Email').isEmail();
 	req.checkBody('code', 'Country Code must not be empty.').notEmpty();
 	req.checkBody('pass1', 'Password must match').equals(req.body.pass2);
+	//req.checkBody('pass1', 'Password must include an upper case, a lower case, a number and a special character').matches(/^(?=.*\d)(?=.[a-z])(?=.[A-Z])(?!.*)(?=.[^a-zA-Z0-9]).{8,}$/, "i");
 	req.checkBody('phone', 'Phone Number must be ten characters').len(10);
-	req.checkBody('address', 'Address must be 200 characters').len(200);
+	req.checkBody('address', 'Address must be 200 characters').len(10, 200);
 	req.checkBody( 'phone', 'Phone Number should be a Number' ).isNumeric( );
 	
+	/*req.sanitizeBody('fullname').trim().escape();
+	req.sanitizeBody('address').trim().escape();
+	req.sanitizeBody('username').trim().escape();
+	req.sanitizeBody('code').trim().escape();
+	req.sanitizeBody('phone').trim().escape();
+	req.sanitizeBody('email').trim().escape();
+	req.sanitizeBody('pass1').trim().escape();
+	req.sanitizeBody('pass2').trim().escape();*/
+	
+	var csrf = req.body.csrf;
 	var username = req.body.username;
 	var password = req.body.pass1;
 	var cpass = req.body.pass2;
@@ -372,12 +368,13 @@ router.post('/register', function (req, res, next) {
 	var phone = req.body.phone;
 	var address = req.body.address;
 	
+	console.log(req.body);
 	var errors = req.validationErrors();
 	if (errors) { 
 	
 		console.log(JSON.stringify(errors));
   
-		res.render('register', { title: 'REGISTRATION FAILED', errors: errors, address: address, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code, sponsor: sponsor});
+		res.render('register', { title: 'REGISTRATION FAILED', errors: errors, address: address, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code});
 	}else{
 		db.query('SELECT username FROM user WHERE username = ?', [username], function(err, results, fields){
           	if (err) throw err;
@@ -385,7 +382,7 @@ router.post('/register', function (req, res, next) {
           	if(results.length===1){
           		var error = "Sorry, this username is taken";
 				console.log(error);
-				res.render('register', {title: "REGISTRATION FAILED", error: error, address: address, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code,  sponsor: sponsor});
+				res.render('register', {title: "REGISTRATION FAILED", error: error, address: address, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code});
           	}else{
 				//check the email
 				db.query('SELECT email FROM user WHERE email = ?', [email], function(err, results, fields){
@@ -393,7 +390,7 @@ router.post('/register', function (req, res, next) {
           			if(results.length===1){
           				var error = "Sorry, this email is taken";
             			console.log(error);
-						res.render('register', {title: "REGISTRATION FAILED", error: error, address: address, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code,  sponsor: sponsor});
+						res.render('register', {title: "REGISTRATION FAILED", error: error, address: address, username: username, email: email, phone: phone, password: password, cpass: cpass, fullname: fullname, code: code});
             		}else{
 						bcrypt.hash(password, saltRounds, null, function(err, hash){
 							db.query( 'INSERT INTO user (full_name, phone, address, username, email, code, password) VALUES(?, ?, ?, ?, ?, ?, ?)', [ fullname, phone, address, username, email, code, hash], function(err, result, fields){

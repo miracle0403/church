@@ -94,12 +94,21 @@ app.use(session({
 	}    
 }));
 
-app.use(csurf());
+//app.use(csurf());
 
-app.use(function(req, res, next) {
-	res.locals._csrf = req.csrfToken();
+// error handler
+/*app.use(function (err, req, res, next) {
+  if (err.code !== 'EBADCSRFTOKEN') return next(err)
+ 
+  // handle CSRF token errors here
+  res.status(403)
+  res.send('You do not have permission to view this page')
+})*/
+
+/*app.use(function(req, res, next) {
+	res.locals.csrf = req.csrfToken();
 	next();
-});
+});*/
 
   //passport
 app.use(passport.initialize());
